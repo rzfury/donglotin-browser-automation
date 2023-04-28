@@ -1,0 +1,21 @@
+{
+  "name": "browser-automation",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "puppeteer": "^19.11.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "user-agents": "^1.0.1362"
+  },
+  "devDependencies": {
+    "@types/user-agents": "^1.0.2",
+    "tsx": "^3.12.6",
+    "typescript": "^5.0.4"
+  }
+}
