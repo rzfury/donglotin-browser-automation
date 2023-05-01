@@ -20,11 +20,14 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     });
   console.log('[MAIN SEQUENCE] Sender identified as: ', inboxSender.name);
 
+  await inbox.click();
+
+  await page.waitForNetworkIdle();
+
   if (inboxSender.desc.includes('mengirim sebuah grup')) {
     console.log('[MAIN SEQUENCE] Sender send probably a group video, this is not quite working. Adding to log and move on.');
     await dumpstr(JSON.stringify(inboxSender), `failures/${inboxSender.name}_-_${getDateForFilename()}.txt`);
-    const checkBtn = await inbox.$(SELECTORS.InboxItemMoveToDoneBtn);
-    await checkBtn?.click();
+    await moveToDone(page);
     return;
   }
 
@@ -34,13 +37,9 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     inboxSender.desc.includes('facebook.com')
   )) {
     console.log('[MAIN SEQUENCE] Sender just chatting, move chat to done and move on.');
-    await inbox.$eval(SELECTORS.InboxItemMoveToDoneBtn, el => (el as HTMLElement).click());
+    await moveToDone(page);
     return;
   }
-
-  await inbox.click();
-
-  await page.waitForNetworkIdle();
 
   const annoyingBtn = await page.$('[data-pagelet="BizInboxMessengerMessageListContainer"] button[type="button"][aria-disabled="false"]');
   const isItTidak = await annoyingBtn?.evaluate(el => el.textContent === 'Tidak');
