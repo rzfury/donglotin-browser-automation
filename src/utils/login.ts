@@ -1,4 +1,4 @@
-import { promises as fs } from 'node:fs';
+import { promises as fs, existsSync } from 'node:fs';
 import { Page } from "puppeteer";
 import { wait } from ".";
 
@@ -22,6 +22,7 @@ export async function loginAndSaveCookies(page: Page, attempts: number = 0) {
     console.log('[LOGIN] Waiting for Element [data-pagelet="BizKitPresenceSelector"]');
     if (await page.waitForSelector('[data-pagelet="BizKitPresenceSelector"]')) {
       const kueh = await page.cookies();
+      if (!existsSync('./stores')) await fs.mkdir('./stores'); 
       await fs.writeFile('./stores/cookies.json', JSON.stringify(kueh, null, 2));
       resolve(true);
     }

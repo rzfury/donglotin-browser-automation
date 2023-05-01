@@ -1,4 +1,6 @@
 class AppState {
+  public static browserRunning: boolean = false;
+
   public static fatalFails: boolean = false;
 
   public static urlHandle: string = '';
