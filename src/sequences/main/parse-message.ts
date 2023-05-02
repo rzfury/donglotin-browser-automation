@@ -21,6 +21,8 @@ export async function parseMessageForUrl(page: Page) {
 
     lastMessageIndex++;
 
+    console.log('[PARSING URL] Checking latest chat if it\'s direct link.');
+
     const messageCellSelector = SELECTORS.MessageLastMessageInList.replace('REPLACE_LAST', lastMessageIndex.toString());
     const messageCell = await messageListContainer?.$(messageCellSelector);
     let supposedUrl: string = await messageCell?.evaluate(el => el.textContent) || '';
@@ -28,6 +30,8 @@ export async function parseMessageForUrl(page: Page) {
     if (supposedUrl?.startsWith('https://www.facebook.com') || supposedUrl?.startsWith('https://m.facebook.com')) {
       return supposedUrl;
     }
+    
+    console.log('[PARSING URL] Latest chat is a card, accessing the card url...');
 
     const messageCellVideoSelector = `${messageCellSelector} a[role="button"]`;
     const messageCellVideo = await messageListContainer?.$(messageCellVideoSelector);

@@ -9,7 +9,7 @@ export default async function mainSequence(page: Page) {
   
   let lastInboxInList;
   while (true) {
-    let lastInboxInList = await page.$(`${SELECTORS.InboxContainer} > ${SELECTORS.InboxItemLast}`);
+    lastInboxInList = await page.$(`${SELECTORS.InboxContainer} > ${SELECTORS.InboxItemLast}`);
     if (lastInboxInList !== null) {
       await evaluateInboxes(page, lastInboxInList);
       await page.waitForNetworkIdle();

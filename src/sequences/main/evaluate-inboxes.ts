@@ -18,14 +18,14 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     .then(async descEl => {
       inboxSender.desc = await descEl?.evaluate((el) => el.textContent) || '';
     });
-  console.log('[MAIN SEQUENCE] Sender identified as: ', inboxSender.name);
+  console.log('[EVALUATING INBOX] Sender identified as: ', inboxSender.name);
 
   await inbox.click();
 
   await page.waitForNetworkIdle();
 
   if (inboxSender.desc.includes('mengirim sebuah grup')) {
-    console.log('[MAIN SEQUENCE] Sender send probably a group video, this is not quite working. Adding to log and move on.');
+    console.log('[EVALUATING INBOX] Sender send probably a group video, this is not quite working. Adding to log and move on.');
     await dumpstr(JSON.stringify(inboxSender), `failures/${inboxSender.name}_-_${getDateForFilename()}.txt`);
     await moveToDone(page);
     return;
@@ -36,7 +36,7 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     inboxSender.desc.includes('mengirim lampiran') ||
     inboxSender.desc.includes('facebook.com')
   )) {
-    console.log('[MAIN SEQUENCE] Sender just chatting, move chat to done and move on.');
+    console.log('[EVALUATING INBOX] Sender just chatting, move chat to done and move on.');
     await moveToDone(page);
     return;
   }
@@ -49,27 +49,29 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
   }
 
   try {
-    console.log('[MAIN SEQUENCE] Parsing Url...');
+    console.log('[EVALUATING INBOX] Parsing Url...');
     const supposedUrl = await parseMessageForUrl(page);
 
-    if (supposedUrl?.startsWith('https://www.facebook.com')) {
-      console.log('[MAIN SEQUENCE] Extracting CDN...');
+    if (supposedUrl?.startsWith('https://www.facebook.com') || supposedUrl?.startsWith('https://m.facebook.com')) {
+      console.log('[EVALUATING INBOX] Extracting CDN...');
       const cdn = await cdnExtractor(supposedUrl);
 
-      console.log('[MAIN SEQUENCE] Replying...');
+      console.log('[EVALUATING INBOX] Replying...');
       await doReply(page, cdn);
 
-      console.log('[MAIN SEQUENCE] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
+      console.log('[EVALUATING INBOX] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
       await moveToDone(page);
       return;
     }
 
     // TODO: handle weird cases...
+
+    console.log('[EVALUATING INBOX] Weird case is not handled!');
   }
   catch (err) {
-    console.log('[MAIN SEQUENCE] [ERROR] An error occured while processing message from ' + inboxSender.name);
+    console.log('[EVALUATING INBOX] [ERROR] An error occured while processing message from ' + inboxSender.name);
     console.error(err);
-    console.log('[MAIN SEQUENCE] Moving on for now.');
+    console.log('[EVALUATING INBOX] Moving on for now.');
     return;
   }
 }

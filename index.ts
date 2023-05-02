@@ -6,6 +6,7 @@ import browserBoot from '~/browser-boot';
 config();
 
 (() => {
+  console.log('[CRONJOB] Starting Bot...');
   const job = new CronJob(
     '*/5 * * * *', //Every 5 minutes
     function() {
@@ -22,4 +23,5 @@ config();
   );
 
   job.start();
+  browserBoot();
 })();
