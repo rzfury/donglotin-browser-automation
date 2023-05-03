@@ -25,7 +25,7 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
   await page.waitForNetworkIdle();
 
   if (inboxSender.desc.includes('mengirim sebuah grup')) {
-    console.log('[EVALUATING INBOX] Sender send probably a group video, this is not quite working. Adding to log and move on.');
+    console.log('[EVALUATING INBOX] Sender probably send a group video, this is not quite working. Adding to log and move on.');
     await dumpstr(JSON.stringify(inboxSender), `failures/${inboxSender.name}_-_${getDateForFilename()}.txt`);
     await moveToDone(page);
     return;

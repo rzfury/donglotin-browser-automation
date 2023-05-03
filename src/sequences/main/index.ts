@@ -1,11 +1,12 @@
 import { Page } from "puppeteer";
 import evaluateInboxes from "./evaluate-inboxes";
 import { SELECTORS } from "./selectors";
+import { wait } from "~/utils";
 
 export default async function mainSequence(page: Page) {
-  console.log('[MAIN SEQUENCE] Starting sequences...')
+  console.log('[BROWSER.MAIN_SEQUENCE] Starting sequences...')
 
-  console.log('[MAIN SEQUENCE] Evaluating Inboxes...');
+  console.log('[BROWSER.MAIN_SEQUENCE] Evaluating Inboxes...');
   
   let lastInboxInList;
   while (true) {
@@ -15,8 +16,8 @@ export default async function mainSequence(page: Page) {
       await page.waitForNetworkIdle();
       continue;
     }
-    break;
-  }
 
-  console.log('[MAIN SEQUENCE] No more inbox to process!');
+    console.log('[BROWSER.MAIN_SEQUENCE] No more inbox to process, will wait for 30 secs.');
+    await wait(30_000);
+  }
 }

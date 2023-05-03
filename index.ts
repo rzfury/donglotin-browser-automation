@@ -1,27 +1,24 @@
 import { config } from 'dotenv';
-import { CronJob } from 'cron';
-import AppState from '~/utils/state';
 import browserBoot from '~/browser-boot';
+import spawnPage from '~/spawn-page';
+import AppState from '~/utils/state';
+import server from './src-express';
 
 config();
 
-(() => {
-  console.log('[CRONJOB] Starting Bot...');
-  const job = new CronJob(
-    '*/5 * * * *', //Every 5 minutes
-    function() {
-      if (AppState.browserRunning) {
-        console.log('[CRONJOB] Browser still running, going to wait for next schedule.')
-      }
-      else {
-        browserBoot();
-      }
-    },
-    null,
-    true,
-    'Asia/Jakarta'
+async function app() {
+  server();
+
+  await browserBoot(
+    async browser => {
+      await spawnPage();
+    }
   );
 
-  job.start();
-  browserBoot();
-})();
+  if (AppState.doReboot) {
+    AppState.doReboot = false;
+    await app();
+  }
+}
+
+app();
