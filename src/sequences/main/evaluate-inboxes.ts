@@ -5,6 +5,7 @@ import { parseMessageForUrl } from './parse-message';
 import { cdnExtractor } from '~/utils/extractor';
 import doReply from './do-reply';
 import moveToDone from './move-to-done';
+import doReplyError from './do-reply-error';
 
 export default async function evaluateInboxes(page: Page, inbox: ElementHandle<Element>) {
   await page.waitForNetworkIdle();
@@ -20,35 +21,34 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     });
   console.log('[EVALUATING INBOX] Sender identified as: ', inboxSender.name);
 
-  await inbox.click();
-
-  await page.waitForNetworkIdle();
-
-  if (inboxSender.desc.includes('mengirim sebuah grup')) {
-    console.log('[EVALUATING INBOX] Sender probably send a group video, this is not quite working. Adding to log and move on.');
-    await dumpstr(JSON.stringify(inboxSender), `failures/${inboxSender.name}_-_${getDateForFilename()}.txt`);
-    await moveToDone(page);
-    return;
-  }
-
-  if (!(
-    inboxSender.desc.includes('mengirimkan sebuah') ||
-    inboxSender.desc.includes('mengirim lampiran') ||
-    inboxSender.desc.includes('facebook.com')
-  )) {
-    console.log('[EVALUATING INBOX] Sender just chatting, move chat to done and move on.');
-    await moveToDone(page);
-    return;
-  }
-
-  const annoyingBtn = await page.$('[data-pagelet="BizInboxMessengerMessageListContainer"] button[type="button"][aria-disabled="false"]');
-  const isItTidak = await annoyingBtn?.evaluate(el => el.textContent === 'Tidak');
-  if (isItTidak) {
-    await annoyingBtn?.click();
-    await page.waitForNetworkIdle();
-  }
-
   try {
+    await inbox.click();
+
+    await page.waitForNetworkIdle();
+
+    if (inboxSender.desc.includes('mengirim sebuah grup')) {
+      console.log('[EVALUATING INBOX] Sender probably send a group video, this is not quite working. Adding to log and move on.');
+      await dumpstr(JSON.stringify(inboxSender), `failures/${inboxSender.name}_-_${getDateForFilename()}.txt`);
+      throw 'group-post';
+    }
+
+    if (!(
+      inboxSender.desc.includes('mengirimkan sebuah') ||
+      inboxSender.desc.includes('mengirim lampiran') ||
+      inboxSender.desc.includes('facebook.com')
+    )) {
+      console.log('[EVALUATING INBOX] Sender just chatting, move chat to done and move on.');
+      await moveToDone(page);
+      return;
+    }
+
+    const annoyingBtn = await page.$('[data-pagelet="BizInboxMessengerMessageListContainer"] button[type="button"][aria-disabled="false"]');
+    const isItTidak = await annoyingBtn?.evaluate(el => el.textContent === 'Tidak');
+    if (isItTidak) {
+      await annoyingBtn?.click();
+      await page.waitForNetworkIdle();
+    }
+
     console.log('[EVALUATING INBOX] Parsing Url...');
     const supposedUrl = await parseMessageForUrl(page);
 
@@ -73,7 +73,7 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     console.error(err);
 
     console.log('[EVALUATING INBOX] Telling sender...');
-    await doReply(page, 'Maaf, download link tidak bisa didapatkan untuk postingan ini.');
+    await doReplyError(page, 'Maaf, download link tidak bisa didapatkan untuk postingan ini.');
 
     console.log('[EVALUATING INBOX] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
     await moveToDone(page);
