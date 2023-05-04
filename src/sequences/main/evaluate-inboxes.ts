@@ -71,7 +71,14 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
   catch (err) {
     console.log('[EVALUATING INBOX] [ERROR] An error occured while processing message from ' + inboxSender.name);
     console.error(err);
-    console.log('[EVALUATING INBOX] Moving on for now.');
+
+    console.log('[EVALUATING INBOX] Telling sender...');
+    await doReply(page, 'Maaf, download link tidak bisa didapatkan untuk postingan ini.');
+
+    console.log('[EVALUATING INBOX] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
+    await moveToDone(page);
+
+    console.log('[EVALUATING INBOX] Moving on.');
     return;
   }
 }

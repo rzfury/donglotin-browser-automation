@@ -1,16 +1,7 @@
 import { Page } from 'puppeteer';
 import { wait } from '~/utils';
 
-export default async function doReply(page: Page, cdnUrl: any) {
-  const n = String.fromCharCode(13);
-  let responseMessage = '';
-  if (typeof (cdnUrl.hdSrc) === 'string') {
-    responseMessage = `Kualitas: HD dan Standar.${n}${n}HD: ${cdnUrl.hdSrc}${n}${n}Standar: ${cdnUrl.sdSrcNoRateLimit}`;
-  }
-  else {
-    responseMessage = `Kualitas: Standar.${n}${n}${cdnUrl.sdSrcNoRateLimit}`;
-  }
-
+export default async function doReply(page: Page, message: string) {
   await page.evaluate((responseMessage) => {
     const text = responseMessage;
     if (navigator?.clipboard) {
@@ -25,7 +16,7 @@ export default async function doReply(page: Page, cdnUrl: any) {
       document.execCommand('copy')
       document.removeEventListener('copy', cb)
     }
-  }, responseMessage);
+  }, message);
 
   await page.click('[data-pagelet="BizP13NInboxMessengerDetailView"] textarea[type="text"]');
   await page.keyboard.down('ControlLeft');
