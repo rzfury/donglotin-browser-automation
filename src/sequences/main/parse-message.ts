@@ -24,10 +24,7 @@ export async function parseMessageForUrl(page: Page) {
     const messageCell = await messageListContainer?.$(SELECTORS.MessageLastMessageInList2);
     let supposedUrl: string = await messageCell?.evaluate(el => el.textContent) || '';
 
-    if (supposedUrl?.startsWith('https://www.facebook.com')
-      || supposedUrl?.startsWith('https://m.facebook.com')
-      || supposedUrl?.startsWith('https://fb.watch')
-    ) {
+    if (supposedUrl?.includes('facebook.com') || supposedUrl?.includes('fb.watch')) {
       console.log('[BROWSER.MAIN.MSG_URL_PARSER] Latest chat is direct link.');
       console.log('[BROWSER.MAIN.MSG_URL_PARSER] ' + supposedUrl);
       return supposedUrl;
