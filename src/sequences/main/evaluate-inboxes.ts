@@ -56,17 +56,20 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
       console.log('[EVALUATING INBOX] Extracting CDN...');
       const cdn = await cdnExtractor(supposedUrl);
 
-      console.log('[EVALUATING INBOX] Replying...');
-      await doReply(page, cdn);
+      if (cdn != null) {
+        console.log('[EVALUATING INBOX] Replying...');
+        await doReply(page, cdn);
 
-      console.log('[EVALUATING INBOX] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
-      await moveToDone(page);
-      return;
+        console.log('[EVALUATING INBOX] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
+        await moveToDone(page);
+        return;
+      }
     }
 
     // TODO: handle weird cases...
 
     console.log('[EVALUATING INBOX] Weird case is not handled!');
+    throw 0;
   }
   catch (err) {
     await page.bringToFront();

@@ -54,27 +54,42 @@ export async function directExtract(url: string) {
 export async function reelExtract(url: string) {
   let cdnData: CDNData | null = null;
 
-  if (url.includes('reel')) {
-    await axios.get(url)
-      .then(async res => {
-        const html = res.data;
-        const $ = cheerio.load(html);
+  await axios.get(url)
+    .then(async res => {
+      const html = res.data;
+      const $ = cheerio.load(html);
+
+      if (html.includes('www.instagram.com')) {
+        const text = $('script[type="text/javascript"]').text();
+        const startIndex = text.indexOf('"') + 1;
+        const endIndex = text.indexOf('"', startIndex);
+        const link = text.substring(startIndex, endIndex).replaceAll('\\', '').replace('reel', 'p').split('?')[0];
+
+        await axios.get(link, { headers: { "User-Agent": userAgents.ios_specific_a() } })
+          .then(async res => {
+            const html = res.data;
+            const $ = cheerio.load(html);
+            const jsonContent = $('script[type="application/ld+json"]').text();
+            const postObj = JSON.parse(jsonContent);
+
+            cdnData = { sdSrcNoRateLimit: postObj.video[0].contentUrl };
+          });
+      }
+      else {
         const act = $('form#login_form').attr('action')!;
         url = decodeURIComponent(act.replace('/login/device-based/regular/login/?next=', '')).split('?')[0]
-      })
-      .catch(() => url = '');
-  }
 
-  if (url.length > 0) {
-    await axios.get('https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(url))
-      .then(res => {
-        const html = res.data;
+        await axios.get('https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(url))
+          .then(res => {
+            const html = res.data;
 
-        if (html.includes('.mp4'))
-          cdnData = extractFullFromHtml(html)
-      })
-      .catch(() => { });
-  }
+            if (html.includes('.mp4'))
+              cdnData = extractFullFromHtml(html)
+          })
+          .catch(() => { });
+      }
+    })
+    .catch(() => url = '');
 
   return cdnData;
 }
