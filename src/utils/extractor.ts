@@ -12,7 +12,13 @@ export async function cdnExtractor(url: string) {
   let cdn: CDNData | null = null;
   if (url.includes('reel')) {
     console.log('[BROWSER.MAIN.EXTRACTOR] The post is a reel.');
-    const cdn = await reelExtract(url);
+
+    console.log('[BROWSER.MAIN.EXTRACTOR] Trying Facebook Reel extract.');
+    cdn = await reelExtract(url);
+    if (cdn) return cdn;
+
+    console.log('[BROWSER.MAIN.EXTRACTOR] Trying Instagram Reel extract.');
+    cdn = await igReelExtract(url);
     if (cdn) return cdn;
   }
 
@@ -65,6 +71,30 @@ export async function reelExtract(url: string) {
     .then(async res => {
       const html = res.data;
       const $ = cheerio.load(html);
+      const act = $('form#login_form').attr('action')!;
+      url = decodeURIComponent(act.replace('/login/device-based/regular/login/?next=', '')).split('?')[0]
+    })
+    .catch(() => url = '');
+
+  await axios.get('https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(url))
+    .then(res => {
+      const html = res.data;
+
+      if (html.includes('.mp4'))
+        cdnData = extractFullFromHtml(html)
+    })
+    .catch(() => { });
+
+  return cdnData;
+}
+
+export async function igReelExtract(url: string) {
+  let cdnData: CDNData | null = null;
+
+  await axios.get(url, { headers: { 'User-Agent': userAgents.ios_specific_a() } })
+    .then(async res => {
+      const html = res.data;
+      const $ = cheerio.load(html);
 
       if (html.includes('www.instagram.com')) {
         const text = $('script[type="text/javascript"]').text();
@@ -81,19 +111,6 @@ export async function reelExtract(url: string) {
 
             cdnData = { sdSrcNoRateLimit: postObj.video[0].contentUrl };
           });
-      }
-      else {
-        const act = $('form#login_form').attr('action')!;
-        url = decodeURIComponent(act.replace('/login/device-based/regular/login/?next=', '')).split('?')[0]
-
-        await axios.get('https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(url))
-          .then(res => {
-            const html = res.data;
-
-            if (html.includes('.mp4'))
-              cdnData = extractFullFromHtml(html)
-          })
-          .catch(() => { });
       }
     })
     .catch(() => url = '');
