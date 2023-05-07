@@ -130,5 +130,5 @@ dist
 .pnp.*
 
 dumpstr/
-stores/
 screenshots/
+stores/cookies.json

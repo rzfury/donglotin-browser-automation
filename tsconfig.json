@@ -15,7 +15,10 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "~express/*": ["./express/*"],
+      "~messaging/*": ["./messaging/*"],
+      "~mention/*": ["./mention/*"],
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

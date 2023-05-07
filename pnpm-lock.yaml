@@ -9,9 +9,11 @@ specifiers:
   cron: ^2.3.0
   dotenv: ^16.0.3
   express: ^4.18.2
+  nanoid: ^4.0.2
   puppeteer: ^19.11.1
   puppeteer-extra: ^3.3.6
   puppeteer-extra-plugin-stealth: ^2.11.2
+  storeon: ^3.1.5
   tsx: ^3.12.6
   typescript: ^5.0.4
   user-agents: ^1.0.1362
@@ -22,9 +24,11 @@ dependencies:
   cron: 2.3.0
   dotenv: 16.0.3
   express: 4.18.2
+  nanoid: 4.0.2
   puppeteer: 19.11.1_typescript@5.0.4
   puppeteer-extra: 3.3.6_puppeteer@19.11.1
   puppeteer-extra-plugin-stealth: 2.11.2_puppeteer-extra@3.3.6
+  storeon: 3.1.5
   user-agents: 1.0.1362
 
 devDependencies:
@@ -1308,6 +1312,12 @@ packages:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
     dev: false
 
+  /nanoid/4.0.2:
+    resolution: {integrity: sha512-7ZtY5KTCNheRGfEFxnedV5zFiORN1+Y1N6zvPTnHQd8ENUvfaDBeuJDZb2bN/oXwXxu3qkTXDzy57W5vAmDTBw==}
+    engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
+    dev: false
+
   /negotiator/0.6.3:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
@@ -1702,6 +1712,19 @@ packages:
   /statuses/2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
+    dev: false
+
+  /storeon/3.1.5:
+    resolution: {integrity: sha512-VuW4GQr3LGQr+gqscqsOz2c9asK9N+B+8+sWs7Pj4OqU7bngYIqsPF3IYpkbmccKNWjs7wwxUAlR+gtL9cEMEg==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      preact: '>=10.0.0'
+      react: '>=16.8.0'
+    peerDependenciesMeta:
+      preact:
+        optional: true
+      react:
+        optional: true
     dev: false
 
   /string-width/4.2.3:
