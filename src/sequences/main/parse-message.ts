@@ -12,7 +12,7 @@ export async function parseMessageForUrl(page: Page) {
     }) as string[];
 
     let lastMessageIndex = messageList.length - 1;
-    while(messageList[lastMessageIndex] === '') {
+    while (messageList[lastMessageIndex] === '') {
       lastMessageIndex--;
       if (lastMessageIndex < 0) {
         return;
@@ -24,12 +24,15 @@ export async function parseMessageForUrl(page: Page) {
     const messageCell = await messageListContainer?.$(SELECTORS.MessageLastMessageInList2);
     let supposedUrl: string = await messageCell?.evaluate(el => el.textContent) || '';
 
-    if (supposedUrl?.startsWith('https://www.facebook.com') || supposedUrl?.startsWith('https://m.facebook.com')) {
+    if (supposedUrl?.startsWith('https://www.facebook.com')
+      || supposedUrl?.startsWith('https://m.facebook.com')
+      || supposedUrl?.startsWith('https://fb.watch')
+    ) {
       console.log('[BROWSER.MAIN.MSG_URL_PARSER] Latest chat is direct link.');
       console.log('[BROWSER.MAIN.MSG_URL_PARSER] ' + supposedUrl);
       return supposedUrl;
     }
-    
+
     console.log('[BROWSER.MAIN.MSG_URL_PARSER] Latest chat is a card, getting the card\'s url...');
 
     const messageCellVideoSelector = `${SELECTORS.MessageLastMessageInList2} a`;
@@ -59,7 +62,7 @@ export async function parseMessageForUrl(page: Page) {
       else {
         await messageCellVideo?.click();
         await wait(5000);
-        
+
         const pages = await page.browser().pages();
         supposedUrl = pages[2].url();
         await pages[2].close();

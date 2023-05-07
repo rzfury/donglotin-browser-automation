@@ -35,7 +35,8 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     if (!(
       inboxSender.desc.includes('mengirimkan sebuah') ||
       inboxSender.desc.includes('mengirim lampiran') ||
-      inboxSender.desc.includes('facebook.com')
+      inboxSender.desc.includes('facebook.com') ||
+      inboxSender.desc.includes('fb.watch')
     )) {
       console.log('[BROWSER.MAIN.EVALUATOR] Sender just chatting, move chat to done and move on.');
       await moveToDone(page);
@@ -52,7 +53,10 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     console.log('[BROWSER.MAIN.EVALUATOR] Parsing Url...');
     const supposedUrl = await parseMessageForUrl(page);
 
-    if (supposedUrl?.startsWith('https://www.facebook.com') || supposedUrl?.startsWith('https://m.facebook.com')) {
+    if (supposedUrl?.startsWith('https://www.facebook.com')
+      || supposedUrl?.startsWith('https://m.facebook.com')
+      || supposedUrl?.startsWith('https://fb.watch')
+    ) {
       console.log('[BROWSER.MAIN.EVALUATOR] Extracting CDN...');
       const cdn = await cdnExtractor(supposedUrl);
 
