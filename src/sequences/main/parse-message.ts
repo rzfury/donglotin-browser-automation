@@ -21,16 +21,16 @@ export async function parseMessageForUrl(page: Page) {
 
     lastMessageIndex++;
 
-    console.log('[PARSING URL] Checking latest chat if it\'s direct link.');
-
     const messageCell = await messageListContainer?.$(SELECTORS.MessageLastMessageInList2);
     let supposedUrl: string = await messageCell?.evaluate(el => el.textContent) || '';
 
     if (supposedUrl?.startsWith('https://www.facebook.com') || supposedUrl?.startsWith('https://m.facebook.com')) {
+      console.log('[BROWSER.MAIN.MSG_URL_PARSER] Latest chat is direct link.');
+      console.log('[BROWSER.MAIN.MSG_URL_PARSER] ' + supposedUrl);
       return supposedUrl;
     }
     
-    console.log('[PARSING URL] Latest chat is a card, accessing the card url...');
+    console.log('[BROWSER.MAIN.MSG_URL_PARSER] Latest chat is a card, getting the card\'s url...');
 
     const messageCellVideoSelector = `${SELECTORS.MessageLastMessageInList2} a`;
     const messageCellVideo = await messageListContainer?.$(messageCellVideoSelector) as (ElementHandle<HTMLAnchorElement> | null | undefined);

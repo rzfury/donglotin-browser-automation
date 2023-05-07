@@ -4,9 +4,9 @@ import { SELECTORS } from "./selectors";
 import { wait } from "~/utils";
 
 export default async function mainSequence(page: Page) {
-  console.log('[BROWSER.MAIN_SEQUENCE] Starting sequences...')
+  console.log('[BROWSER.MAIN] Starting sequences...')
 
-  console.log('[BROWSER.MAIN_SEQUENCE] Evaluating Inboxes...');
+  console.log('[BROWSER.MAIN] Evaluating Inboxes...');
   
   let lastInboxInList;
   while (true) {
@@ -17,7 +17,7 @@ export default async function mainSequence(page: Page) {
       continue;
     }
 
-    console.log('[BROWSER.MAIN_SEQUENCE] No more inbox to process, will wait for 30 secs.');
+    console.log('[BROWSER.MAIN] No more inbox to process, will wait for 30 secs.');
     await wait(30_000);
   }
 }

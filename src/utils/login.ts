@@ -3,10 +3,10 @@ import { Page } from "puppeteer";
 import { wait } from ".";
 
 export async function loginAndSaveCookies(page: Page, attempts: number = 0) {
-  console.log(`[LOGIN] Attempting to login (Attempts: ${attempts})`);
+  console.log(`[BROWSER.LOGIN] Attempting to login (Attempts: ${attempts})`);
   return new Promise<boolean>(async (resolve, reject) => {
 
-    console.log('[LOGIN] Typing Cred...');
+    console.log('[BROWSER.LOGIN] Typing Cred...');
     await page.focus('#email');
     await wait(500);
     await page.keyboard.type(process.env.FACEBOOK_EMAIL!.trim(), { delay: 100 });
@@ -16,10 +16,10 @@ export async function loginAndSaveCookies(page: Page, attempts: number = 0) {
     await page.keyboard.type(process.env.FACEBOOK_PASS!.trim(), { delay: 100 });
     await wait(1000);
 
-    console.log('[LOGIN] Logging in...');
+    console.log('[BROWSER.LOGIN] Logging in...');
     await page.click('#loginbutton');
 
-    console.log('[LOGIN] Waiting for Element [data-pagelet="BizKitPresenceSelector"]');
+    console.log('[BROWSER.LOGIN] Waiting for Element [data-pagelet="BizKitPresenceSelector"]');
     if (await page.waitForSelector('[data-pagelet="BizKitPresenceSelector"]')) {
       const kueh = await page.cookies();
       if (!existsSync('./stores')) await fs.mkdir('./stores'); 

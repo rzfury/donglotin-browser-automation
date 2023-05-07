@@ -1,7 +1,8 @@
 import { Page } from 'puppeteer';
 import { wait } from '~/utils';
+import { CDNData } from '~/utils/extractor';
 
-export default async function doReply(page: Page, cdnUrl: any) {
+export default async function doReply(page: Page, cdnUrl: CDNData) {
   const n = String.fromCharCode(13);
   let responseMessage = '';
   if (typeof (cdnUrl.hdSrc) === 'string') {

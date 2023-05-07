@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import * as userAgents from './user-agents';
 
-type CDNData = {
+export type CDNData = {
   hdSrc?: string;
   sdSrc?: string;
   sdSrcNoRateLimit: string;
@@ -11,25 +11,32 @@ type CDNData = {
 export async function cdnExtractor(url: string) {
   let cdn: CDNData | null = null;
   if (url.includes('reel')) {
+    console.log('[BROWSER.MAIN.EXTRACTOR] The post is a reel.');
     const cdn = await reelExtract(url);
     if (cdn) return cdn;
   }
 
+  console.log('[BROWSER.MAIN.EXTRACTOR] Using Direct Extraction');
   cdn = await directExtract(url);
   if (cdn) return cdn;
 
+  console.log('[BROWSER.MAIN.EXTRACTOR] Using Group Post Extraction');
   cdn = await groupPostExtract(url);
   if (cdn) return cdn;
 
+  console.log('[BROWSER.MAIN.EXTRACTOR] Looking for meta og tags');
   cdn = await metaOgExtract(url);
   if (cdn) return cdn;
 
+  console.log('[BROWSER.MAIN.EXTRACTOR] Finding element with data-store attribute');
   cdn = await dataStoreElementExtract(url);
   if (cdn) return cdn;
 
+  console.log('[BROWSER.MAIN.EXTRACTOR] Using specific UA "macos_10_15_7"');
   cdn = await specificUAExtract(url, 'macos_10_15_7');
   if (cdn) return cdn;
 
+  console.log('[BROWSER.MAIN.EXTRACTOR] Using specific UA "ios_16_3_1_safari_604_1"');
   cdn = await specificUAExtract(url, 'ios_16_3_1_safari_604_1');
   if (cdn) return cdn;
 

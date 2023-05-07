@@ -19,7 +19,7 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     .then(async descEl => {
       inboxSender.desc = await descEl?.evaluate((el) => el.textContent) || '';
     });
-  console.log('[EVALUATING INBOX] Sender identified as: ', inboxSender.name);
+  console.log('[BROWSER.MAIN.EVALUATOR] Sender identified as: ', inboxSender.name);
 
   try {
     await inbox.click();
@@ -27,7 +27,7 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     await page.waitForNetworkIdle();
 
     if (inboxSender.desc.includes('mengirim sebuah grup')) {
-      console.log('[EVALUATING INBOX] Sender probably send a group video, this is not quite working. Adding to log and move on.');
+      console.log('[BROWSER.MAIN.EVALUATOR] Sender probably send a group video, this is not quite working. Adding to log and move on.');
       await dumpstr(JSON.stringify(inboxSender), `failures/${inboxSender.name}_-_${getDateForFilename()}.txt`);
       throw 'group-post';
     }
@@ -37,7 +37,7 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
       inboxSender.desc.includes('mengirim lampiran') ||
       inboxSender.desc.includes('facebook.com')
     )) {
-      console.log('[EVALUATING INBOX] Sender just chatting, move chat to done and move on.');
+      console.log('[BROWSER.MAIN.EVALUATOR] Sender just chatting, move chat to done and move on.');
       await moveToDone(page);
       return;
     }
@@ -49,18 +49,18 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
       await page.waitForNetworkIdle();
     }
 
-    console.log('[EVALUATING INBOX] Parsing Url...');
+    console.log('[BROWSER.MAIN.EVALUATOR] Parsing Url...');
     const supposedUrl = await parseMessageForUrl(page);
 
     if (supposedUrl?.startsWith('https://www.facebook.com') || supposedUrl?.startsWith('https://m.facebook.com')) {
-      console.log('[EVALUATING INBOX] Extracting CDN...');
+      console.log('[BROWSER.MAIN.EVALUATOR] Extracting CDN...');
       const cdn = await cdnExtractor(supposedUrl);
 
       if (cdn != null) {
-        console.log('[EVALUATING INBOX] Replying...');
+        console.log('[BROWSER.MAIN.EVALUATOR] Replying...');
         await doReply(page, cdn);
 
-        console.log('[EVALUATING INBOX] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
+        console.log('[BROWSER.MAIN.EVALUATOR] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
         await moveToDone(page);
         return;
       }
@@ -68,22 +68,22 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
 
     // TODO: handle weird cases...
 
-    console.log('[EVALUATING INBOX] Weird case is not handled!');
+    console.log('[BROWSER.MAIN.EVALUATOR] Weird case is not handled!');
     throw 0;
   }
   catch (err) {
     await page.bringToFront();
 
-    console.log('[EVALUATING INBOX] [ERROR] An error occured while processing message from ' + inboxSender.name);
+    console.log('[BROWSER.MAIN.EVALUATOR] [ERROR] An error occured while processing message from ' + inboxSender.name);
     console.error(err);
 
-    console.log('[EVALUATING INBOX] Telling sender...');
+    console.log('[BROWSER.MAIN.EVALUATOR] Telling sender...');
     await doReplyError(page, 'Tidak bisa mendapatkan download link untuk postingan ini.');
 
-    console.log('[EVALUATING INBOX] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
+    console.log('[BROWSER.MAIN.EVALUATOR] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
     await moveToDone(page);
 
-    console.log('[EVALUATING INBOX] Moving on.');
+    console.log('[BROWSER.MAIN.EVALUATOR] Moving on.');
     return;
   }
 }
