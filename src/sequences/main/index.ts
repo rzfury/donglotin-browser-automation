@@ -16,8 +16,6 @@ export default async function mainSequence(page: Page) {
       await page.waitForNetworkIdle();
       continue;
     }
-
-    console.log('[BROWSER.MAIN] No more inbox to process, will wait for 30 secs.');
-    await wait(30_000);
+    await wait(10_000);
   }
 }

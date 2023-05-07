@@ -53,10 +53,7 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     console.log('[BROWSER.MAIN.EVALUATOR] Parsing Url...');
     const supposedUrl = await parseMessageForUrl(page);
 
-    if (supposedUrl?.startsWith('https://www.facebook.com')
-      || supposedUrl?.startsWith('https://m.facebook.com')
-      || supposedUrl?.startsWith('https://fb.watch')
-    ) {
+    if (supposedUrl?.includes('facebook.com') || supposedUrl?.includes('fb.watch')) {
       console.log('[BROWSER.MAIN.EVALUATOR] Extracting CDN...');
       const cdn = await cdnExtractor(supposedUrl);
 
