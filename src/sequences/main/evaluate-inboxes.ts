@@ -69,11 +69,13 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     console.log('[EVALUATING INBOX] Weird case is not handled!');
   }
   catch (err) {
+    await page.bringToFront();
+
     console.log('[EVALUATING INBOX] [ERROR] An error occured while processing message from ' + inboxSender.name);
     console.error(err);
 
     console.log('[EVALUATING INBOX] Telling sender...');
-    await doReplyError(page, 'Maaf, download link tidak bisa didapatkan untuk postingan ini.');
+    await doReplyError(page, 'Tidak bisa mendapatkan download link untuk postingan ini.');
 
     console.log('[EVALUATING INBOX] [SUCCESS] Message has been sent to ' + inboxSender.name + '!');
     await moveToDone(page);
