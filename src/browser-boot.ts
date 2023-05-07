@@ -10,7 +10,7 @@ export default async function browserBoot(onBooted: (browser: Browser) => Promis
 
   puppeteer.use(Stealth());
   await puppeteer.launch({
-    headless: process.env.ENVIRONMENT ? false : 'new',
+    headless: process.env.ENVIRONMENT === 'development' ? false : 'new',
     args: ['--remote-debugging-port=16969', '--disable-notifications'],
   }).then(async browser => {
     console.log('[BROWSER] Browser booted!');
