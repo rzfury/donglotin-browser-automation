@@ -6,23 +6,10 @@ export async function parseMessageForUrl(page: Page) {
   const messageContainer = await page.$(SELECTORS.MessageContainer);
 
   if (messageContainer) {
-    const messageListContainer = await messageContainer.$('div > div > div + div');
-    const messageList: string[] = await messageListContainer?.evaluate((el) => {
-      return Array.from(el.children).map(ch => ch.getAttribute('class') || '');
-    }) as string[];
-
-    let lastMessageIndex = messageList.length - 1;
-    while (messageList[lastMessageIndex] === '') {
-      lastMessageIndex--;
-      if (lastMessageIndex < 0) {
-        return;
-      }
-    }
-
-    lastMessageIndex++;
-
-    const messageCell = await messageListContainer?.$(SELECTORS.MessageLastMessageInList2);
+    const messageCell = await messageContainer?.$(SELECTORS.MessageLastMessageInList2);
     let supposedUrl: string = await messageCell?.evaluate(el => el.textContent) || '';
+
+    console.log('[BROWSER.MAIN.MSG_URL_PARSER] Supposed URL: ' + supposedUrl);
 
     if (supposedUrl?.includes('facebook.com') || supposedUrl?.includes('fb.watch')) {
       console.log('[BROWSER.MAIN.MSG_URL_PARSER] Latest chat is direct link.');
@@ -32,8 +19,7 @@ export async function parseMessageForUrl(page: Page) {
 
     console.log('[BROWSER.MAIN.MSG_URL_PARSER] Latest chat is a card, getting the card\'s url...');
 
-    const messageCellVideoSelector = `${SELECTORS.MessageLastMessageInList2} a`;
-    const messageCellVideo = await messageListContainer?.$(messageCellVideoSelector) as (ElementHandle<HTMLAnchorElement> | null | undefined);
+    const messageCellVideo = await messageContainer?.$(`${SELECTORS.MessageLastMessageInList2} a`) as (ElementHandle<HTMLAnchorElement> | null | undefined);
 
     let messageCellVideoHref = await messageCellVideo?.evaluate(el => el.href) || '';
     if (messageCellVideoHref.includes('https://l.facebook.com/l.php')) {
@@ -42,7 +28,14 @@ export async function parseMessageForUrl(page: Page) {
     }
 
     if (messageCellVideoHref.length == 0) {
-      return null;
+      await messageCellVideo?.click();
+      await wait(5000);
+
+      const pages = await page.browser().pages();
+      supposedUrl = pages[2].url();
+      await pages[2].close();
+
+      return supposedUrl;
     }
 
     if (messageCellVideoHref.includes('facebook.com')) {
