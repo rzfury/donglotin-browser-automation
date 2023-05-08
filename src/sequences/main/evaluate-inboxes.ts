@@ -57,6 +57,8 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
       console.log('[BROWSER.MAIN.EVALUATOR] Extracting CDN...');
       const cdn = await cdnExtractor(supposedUrl);
 
+      console.log(cdn);
+
       if (cdn != null) {
         console.log('[BROWSER.MAIN.EVALUATOR] Replying...');
         await doReply(page, cdn);
@@ -76,7 +78,6 @@ export default async function evaluateInboxes(page: Page, inbox: ElementHandle<E
     await page.bringToFront();
 
     console.log('[BROWSER.MAIN.EVALUATOR] [ERROR] An error occured while processing message from ' + inboxSender.name);
-    console.error(err);
 
     console.log('[BROWSER.MAIN.EVALUATOR] Telling sender...');
     await doReplyError(page, 'Tidak bisa mendapatkan download link untuk postingan ini.');

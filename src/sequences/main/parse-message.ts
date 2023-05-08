@@ -6,7 +6,23 @@ export async function parseMessageForUrl(page: Page) {
   const messageContainer = await page.$(SELECTORS.MessageContainer);
 
   if (messageContainer) {
-    const messageCell = await messageContainer?.$(SELECTORS.MessageLastMessageInList2);
+    const messageListContainer = await messageContainer.$('div > div > div + div');
+    const messageList: string[] = await messageListContainer?.evaluate((el) => {
+      return Array.from(el.children).map(ch => ch.getAttribute('class') || '');
+    }) as string[];
+
+    let lastMessageIndex = messageList.length - 1;
+    while (messageList[lastMessageIndex] === '') {
+      lastMessageIndex--;
+      if (lastMessageIndex < 0) {
+        return;
+      }
+    }
+
+    lastMessageIndex++;
+
+    const messageCellSelector = SELECTORS.MessageLastMessageInList.replace('REPLACE_LAST', lastMessageIndex.toString());
+    const messageCell = await messageListContainer?.$(messageCellSelector);
     let supposedUrl: string = await messageCell?.evaluate(el => el.textContent) || '';
 
     console.log('[BROWSER.MAIN.MSG_URL_PARSER] Supposed URL: ' + supposedUrl);

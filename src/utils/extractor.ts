@@ -46,6 +46,10 @@ export async function cdnExtractor(url: string) {
   cdn = await specificUAExtract(url, 'ios_16_3_1_safari_604_1');
   if (cdn) return cdn;
 
+  console.log('[BROWSER.MAIN.EXTRACTOR] Using specific UA "win_wow64_chrome_24"');
+  cdn = await specificUAExtract(url, 'win_wow64_chrome_24');
+  if (cdn) return cdn;
+
   return null;
 }
 
@@ -197,6 +201,7 @@ export async function specificUAExtract(
   url: string,
   ua?: 'macos_10_15_7'
     | 'ios_16_3_1_safari_604_1'
+    | 'win_wow64_chrome_24'
 ) {
   let cdnData: CDNData | null = null;
   let userAgent: string = userAgents.random();
@@ -208,13 +213,16 @@ export async function specificUAExtract(
   else if (ua === 'ios_16_3_1_safari_604_1') {
     userAgent = userAgents.ios_specific_a();
   }
+  else if (ua === 'win_wow64_chrome_24') {
+    userAgent = 'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13';
+  }
 
   await axios.get(url, { headers: { 'User-Agent': userAgent } })
     .then(async res => {
       const html = res.data;
       const $ = cheerio.load(html);
 
-      if (ua === 'macos_10_15_7') {
+      if (ua === 'macos_10_15_7' || ua === 'win_wow64_chrome_24') {
         const dataStoreEl = $('[data-store*=.mp4]');
         if (dataStoreEl.attr('data-store')) {
           // has data-store element, can directly get cdn
