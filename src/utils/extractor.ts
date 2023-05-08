@@ -150,27 +150,41 @@ export async function metaOgExtract(url: string) {
 export async function groupPostExtract(url: string) {
   let cdnData: CDNData | null = null;
 
-  await axios.get(url, { headers: { 'User-Agent': userAgents.ios() } })
-    .then(async res => {
-      const html = res.data;
-      const $ = cheerio.load(html);
+  if ((/^https:\/\/www\.facebook\.com\/groups\/\d+\/posts\/\d+\/?$/).test(url)) {
+    const allegedlyUrl = url.replace('groups/', '');
+    await axios.get('https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(allegedlyUrl))
+      .then(res => {
+        const html = res.data;
 
-      if (url.includes('groups') && url.includes('multi_permalinks')) {
-        const videoId = url.match(/multi_permalinks=\d+/g)![0].replace('multi_permalinks=', '');
-        const pageCanonical = $('link[rel="canonical"]').attr('href')!;
-        const allegedlyUrl = `${pageCanonical.replace('groups/', '')}posts/${videoId}`;
+        if (html.includes('.mp4')) {
+          cdnData = extractFullFromHtml(html);
+        }
+      })
+      .catch(() => { })
+  }
+  else {
+    await axios.get(url, { headers: { 'User-Agent': userAgents.ios() } })
+      .then(async res => {
+        const html = res.data;
+        const $ = cheerio.load(html);
 
-        await axios.get('https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(allegedlyUrl))
-          .then(res => {
-            const html = res.data;
+        if (url.includes('groups') && url.includes('multi_permalinks')) {
+          const videoId = url.match(/multi_permalinks=\d+/g)![0].replace('multi_permalinks=', '');
+          const pageCanonical = $('link[rel="canonical"]').attr('href')!;
+          const allegedlyUrl = `${pageCanonical.replace('groups/', '')}posts/${videoId}`;
 
-            if (html.includes('.mp4')) {
-              cdnData = extractFullFromHtml(html);
-            }
-          })
-          .catch(() => { })
-      }
-    });
+          await axios.get('https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(allegedlyUrl))
+            .then(res => {
+              const html = res.data;
+
+              if (html.includes('.mp4')) {
+                cdnData = extractFullFromHtml(html);
+              }
+            })
+            .catch(() => { })
+        }
+      });
+  }
 
   return cdnData;
 }
