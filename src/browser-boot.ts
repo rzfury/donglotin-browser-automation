@@ -25,8 +25,7 @@ export default async function browserBoot(onBooted: (browser: Browser) => Promis
     });
 
     browser.once('RZF_DANGER_REBOOT', event => {
-      console.log('[BROWSER.ERROR] Browser encountered an error and need to be rebooted!');
-      AppState.fails = true;
+      console.log('[BROWSER.ERROR] Browser need to be rebooted!');
       AppState.doReboot = true;
       browser.close();
     });
