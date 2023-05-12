@@ -3,6 +3,7 @@ import puppeteer from 'puppeteer-extra';
 import Stealth from 'puppeteer-extra-plugin-stealth';
 import UserAgent from 'user-agents';
 import AppState from '~/utils/state';
+import { wait } from './utils';
 
 export default async function browserBoot(onBooted: (browser: Browser) => Promise<void>) {
   const agent = new UserAgent(/Mozilla.*Win64.*Chrome.*112/);
@@ -16,18 +17,27 @@ export default async function browserBoot(onBooted: (browser: Browser) => Promis
     console.log('[BROWSER] Browser booted!');
 
     AppState.fails = false;
+    AppState.needToClose = false;
     AppState.setBrowser(browser);
 
-    browser.once('RZF_FATAL_CLOSE', event => {
+    browser.once('RZF_FATAL_CLOSE', async event => {
       console.log('[BROWSER.ERROR] Browser encountered a fatal error and need to be closed!');
       AppState.fails = true;
-      browser.close();
+      AppState.needToClose = true;
+
+      await wait(3000);
+
+      await browser.close();
     });
 
-    browser.once('RZF_DANGER_REBOOT', event => {
+    browser.once('RZF_DANGER_REBOOT', async event => {
       console.log('[BROWSER.ERROR] Browser need to be rebooted!');
       AppState.doReboot = true;
-      browser.close();
+      AppState.needToClose = true;
+
+      await wait(3000);
+
+      await browser.close();
     });
 
     browser.defaultBrowserContext().overridePermissions(

@@ -6,6 +6,7 @@ class AppState {
 
   public static fails: boolean = false;
   public static doReboot: boolean = false;
+  public static needToClose: boolean = false;
 
   private static _browser: Browser | null = null;
   public static browserRunning: boolean = false;
